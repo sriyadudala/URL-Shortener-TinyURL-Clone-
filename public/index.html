@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LuminaLink - Premium URL Shortener & Analytics</title>
+  <meta name="description" content="Shorten your URLs instantly with custom aliases, link expiration, and detailed real-time click analytics on a modern glassmorphic dashboard.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- ChartJS and QRCode CDN Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+  <!-- Animated Background Glows -->
+  <div class="glow-bg">
+    <div class="glow-sphere glow-1"></div>
+    <div class="glow-sphere glow-2"></div>
+    <div class="glow-sphere glow-3"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo">
+        <div class="logo-icon">
+          <i class="fa-solid fa-link"></i>
+        </div>
+        <div class="logo-text">
+          <h1>Lumina<span>Link</span></h1>
+          <p>Streamlined URLs • Deep Analytics</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a href="#dashboard-section" class="nav-btn"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Shortener Section -->
+      <section class="shortener-section">
+        <div class="glass-card shortener-card">
+          <h2 class="section-title">Shorten a Long Link</h2>
+          <p class="section-subtitle">Instantly compress long URLs and unlock deep redirection analytics.</p>
+          
+          <form id="shorten-form" class="shorten-form">
+            <div class="input-group">
+              <label for="long-url" class="floating-label">Destination URL</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-globe input-icon"></i>
+                <input type="text" id="long-url" placeholder="https://example.com/very-long-link-path" required autocomplete="off">
+              </div>
+            </div>
+
+            <!-- Advanced Settings Accordion -->
+            <div class="accordion">
+              <button type="button" class="accordion-trigger" id="toggle-advanced">
+                <span><i class="fa-solid fa-sliders"></i> Advanced Settings (Alias & Expiration)</span>
+                <i class="fa-solid fa-chevron-down arrow-icon"></i>
+              </button>
+              <div class="accordion-content" id="advanced-options">
+                <div class="advanced-grid">
+                  <!-- Custom Alias -->
+                  <div class="input-group">
+                    <label for="custom-alias" class="field-label">Custom Alias (Optional)</label>
+                    <div class="input-wrapper">
+                      <span class="url-prefix" id="alias-prefix">lumina/</span>
+                      <input type="text" id="custom-alias" placeholder="custom-name" autocomplete="off" minlength="3" maxlength="20">
+                    </div>
+                    <span class="input-hint">3-20 letters, numbers, dashes, or underscores.</span>
+                  </div>
+                  
+                  <!-- Expiration Date -->
+                  <div class="input-group">
+                    <label for="expires-at" class="field-label">Link Expiration (Optional)</label>
+                    <div class="input-wrapper">
+                      <i class="fa-regular fa-calendar-days input-icon"></i>
+                      <input type="datetime-local" id="expires-at">
+                    </div>
+                    <span class="input-hint">Automatically disables link after this time.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" id="submit-btn" class="primary-btn">
+              <span>Shorten Link</span>
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </button>
+          </form>
+
+          <!-- Result Container (Hidden initially) -->
+          <div id="result-container" class="result-container glass-inset hide">
+            <div class="result-header">
+              <h3><i class="fa-solid fa-circle-check"></i> Link Shortened!</h3>
+              <button id="close-result" class="close-icon-btn" type="button"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="result-body">
+              <div class="short-url-box">
+                <input type="text" id="generated-url" readonly>
+                <button id="copy-btn" class="copy-action-btn" type="button" title="Copy to clipboard">
+                  <i class="fa-regular fa-copy"></i>
+                  <span>Copy</span>
+                </button>
+              </div>
+              
+              <div class="result-details">
+                <div class="qr-container">
+                  <div id="result-qrcode"></div>
+                  <span>Scan QR Code</span>
+                </div>
+                <div class="meta-info">
+                  <p><strong>Original Link:</strong> <a href="#" id="result-original-link" target="_blank" class="truncate-link"></a></p>
+                  <p id="result-expiration-text"></p>
+                  <button id="view-new-stats-btn" type="button" class="secondary-btn"><i class="fa-solid fa-chart-bar"></i> View Analytics</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dashboard Section -->
+      <section id="dashboard-section" class="dashboard-section">
+        <div class="dashboard-header-row">
+          <h2 class="section-title"><i class="fa-solid fa-table-list"></i> Link Directory</h2>
+          
+          <div class="dashboard-toolbar">
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass search-icon"></i>
+              <input type="text" id="search-input" placeholder="Search links or alias...">
+            </div>
+            <button id="refresh-btn" class="refresh-btn" title="Refresh Dashboard" type="button"><i class="fa-solid fa-rotate"></i> Refresh</button>
+          </div>
+        </div>
+
+        <!-- Dashboard Loading / Empty State -->
+        <div id="dashboard-empty" class="dashboard-empty-card glass-card hide">
+          <i class="fa-regular fa-folder-open empty-icon"></i>
+          <h3>No links shortened yet</h3>
+          <p>Get started by pasting your first destination URL in the form above!</p>
+        </div>
+
+        <div id="dashboard-loading" class="dashboard-loading-card glass-card">
+          <div class="spinner"></div>
+          <p>Retrieving your link database...</p>
+        </div>
+
+        <!-- Dashboard Links Grid -->
+        <div id="links-grid" class="links-grid">
+          <!-- Dynamically populated card items -->
+        </div>
+      </section>
+    </main>
+
+    <!-- Details Drawer / Modal -->
+    <div id="analytics-modal" class="modal-backdrop hide">
+      <div class="modal-container glass-card">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <h3 id="modal-short-code">/abcdef</h3>
+            <p id="modal-long-url" class="truncate-link">https://example.com</p>
+          </div>
+          <button id="close-modal" class="close-icon-btn" type="button"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <div class="modal-body">
+          <!-- Overview Stats -->
+          <div class="modal-stats-overview">
+            <div class="stat-card glass-inset">
+              <span class="stat-label">Total Redirect Clicks</span>
+              <span class="stat-value" id="stat-total-clicks">0</span>
+            </div>
+            <div class="stat-card glass-inset">
+              <span class="stat-label">Status</span>
+              <span class="stat-value" id="stat-status">-</span>
+            </div>
+            <div class="stat-card glass-inset">
+              <span class="stat-label">Created On</span>
+              <span class="stat-value" id="stat-created-date">-</span>
+            </div>
+          </div>
+
+          <div class="modal-layout-grid">
+            <!-- Charts Section -->
+            <div class="charts-column">
+              <div class="chart-wrapper glass-inset">
+                <h4>Clicks Timeline</h4>
+                <div class="canvas-container">
+                  <canvas id="timeline-chart"></canvas>
+                </div>
+              </div>
+              <div class="chart-row">
+                <div class="chart-wrapper glass-inset">
+                  <h4>Devices</h4>
+                  <div class="canvas-container">
+                    <canvas id="devices-chart"></canvas>
+                  </div>
+                </div>
+                <div class="chart-wrapper glass-inset">
+                  <h4>Browsers</h4>
+                  <div class="canvas-container">
+                    <canvas id="browsers-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Side details (QR & Referrers) -->
+            <div class="side-column">
+              <div class="qr-download-card glass-inset">
+                <h4>QR Code Identifier</h4>
+                <div id="modal-qrcode"></div>
+                <button id="download-qr-btn" type="button" class="secondary-btn"><i class="fa-solid fa-download"></i> Download QR</button>
+              </div>
+
+              <div class="referrers-card glass-inset">
+                <h4>Top Referrer Channels</h4>
+                <ul id="referrers-list" class="referrers-list">
+                  <!-- Dynamically populated referrer items -->
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>&copy; 2026 LuminaLink. Designed with modern glassmorphic aesthetics.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
